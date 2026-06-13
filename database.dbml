@@ -1,0 +1,89 @@
+Table users {
+  id bigserial [pk, not null]
+  uuid varchar(36) [unique, not null]
+  first_name varchar(100) [not null]
+  last_name varchar(100) [not null]
+  email varchar(255) [unique, not null]
+  password varchar(255) [not null]
+  avatar varchar(255)
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    uuid [unique]
+    email [unique]
+  }
+}
+
+Table posts {
+  id bigserial [pk, not null]
+  uuid varchar(36) [unique, not null]
+  user_id bigint [not null, ref: > users.id]
+  text text
+  visibility visibility_enum [not null, default: 'public']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    uuid [unique]
+    user_id
+  }
+}
+
+Table media {
+  id bigserial [pk, not null]
+  uuid varchar(36) [unique, not null]
+  post_id bigint [not null, ref: > posts.id]
+  path varchar(255) [not null]
+  sort_order int [default: 0]
+  created_at timestamp [default: `now()`]
+
+  indexes {
+    uuid [unique]
+    post_id
+  }
+}
+
+Table comments {
+  id bigserial [pk, not null]
+  uuid varchar(36) [unique, not null]
+  user_id bigint [not null, ref: > users.id]
+  post_id bigint [not null, ref: > posts.id]
+  parent_id bigint [ref: > comments.id]
+  text text [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    uuid [unique]
+    post_id
+    parent_id
+    user_id
+  }
+}
+
+Table likes {
+  id bigserial [pk, not null]
+  uuid varchar(36) [unique, not null]
+  user_id bigint [not null, ref: > users.id]
+  likeable_id bigint [not null]
+  likeable_type likeable_type_enum [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    uuid [unique]
+    (user_id, likeable_id, likeable_type) [unique, name: unique_like]
+    (likeable_id, likeable_type)
+  }
+}
+
+Enum visibility_enum {
+  public
+  private
+}
+
+Enum likeable_type_enum {
+  post
+  comment
+}
