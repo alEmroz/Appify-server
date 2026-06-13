@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\AuthUserResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
@@ -39,6 +40,8 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
-        return response()->json($request->user(), Response::HTTP_OK);
+        $userResource = new AuthUserResource($request->user());
+
+        return response()->json($userResource);
     }
 }

@@ -122,9 +122,6 @@ Response `200`:
     "uuid": "2d1745c9-2f2c-48df-a667-4bb8a383301a",
     "first_name": "John",
     "last_name": "Doe",
-    "email": "john@example.com",
-    "email_verified_at": null,
-    "created_at": "2026-06-13T11:08:16.000000Z",
-    "updated_at": "2026-06-13T11:08:16.000000Z"
+    "email": "john@example.com"
 }
 ```
