@@ -7,6 +7,8 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class CommentService
@@ -74,11 +76,22 @@ class CommentService
         return $reply;
     }
 
+    public function update(User $user, Comment $comment, array $data): Comment
+    {
+        Gate::authorize('update', $comment);
+
+        $comment->update(Arr::only($data, ['text']));
+
+        $comment->load(['user' => fn ($q) => $q->select(self::USER_COLUMNS)]);
+        $comment->loadCount('likes');
+        $comment->loadExists(['likes as is_liked' => fn ($q) => $q->where('user_id', $user->id)]);
+
+        return $comment;
+    }
+
     public function delete(User $user, Comment $comment): void
     {
-        if ($comment->user_id !== $user->id) {
-            throw new ModelNotFoundException();
-        }
+        Gate::authorize('delete', $comment);
 
         $comment->replies()->delete();
         $comment->delete();
