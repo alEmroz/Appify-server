@@ -22,7 +22,10 @@ class PostController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $posts = $this->postService->list($request->user());
+        $posts = $this->postService->list(
+            $request->user(),
+            $request->query('cursor'),
+        );
 
         $postsResource = PostResource::collection($posts);
 
@@ -67,8 +70,18 @@ class PostController extends Controller
 
     public function likes(Request $request, Post $post): JsonResponse
     {
-        $result = $this->likeService->likers($post);
+        $paginator = $this->likeService->likers($post);
 
-        return response()->json($result, Response::HTTP_OK);
+        $users = collect($paginator->items())
+            ->map(fn ($like) => new UserResource($like->user));
+
+        return response()->json([
+            'data' => $users,
+            'meta' => [
+                'next_cursor' => $paginator->nextCursor()?->encode(),
+                'prev_cursor' => $paginator->previousCursor()?->encode(),
+                'per_page' => $paginator->perPage(),
+            ],
+        ]);
     }
 }

@@ -9,46 +9,48 @@ Returns public posts + the authenticated user's own private posts, newest first.
 **Query params:**
 | Param | Type | Description |
 |-------|------|-------------|
-| `cursor` | `string` | Cursor for pagination (the `next_cursor` value from the previous response) |
+| `cursor` | `string` | Cursor for pagination (the `meta.next_cursor` value from the previous response) |
 
 **Response:** `200 OK`
 ```json
 {
     "data": [
         {
-            "uuid": "d422f22f-c062-4f0f-a071-5a737abc5f1b",
-            "text": "Hello world",
+            "uuid": "79f0c561-a0d7-40a9-9cbf-5d465679d5be",
+            "text": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
             "visibility": "public",
             "user": {
-                "uuid": "a10af5af-3581-42a5-8020-e79de7bd3b1b",
-                "first_name": "Jane",
-                "last_name": "Doe"
+                "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+                "first_name": "Fahim",
+                "last_name": "al Emroz"
             },
-            "media": {
-                "uuid": "26404863-25ac-46c3-badc-802cde99aeb8",
-                "url": "http://localhost:8000/storage/posts/abc123.jpg",
-                "sort_order": 0
-            },
-            "likes_count": 5,
-            "comments_count": 3,
+            "media": null,
+            "likes_count": 0,
+            "comments_count": 0,
             "is_liked": false,
-            "created_at": "2026-06-13T13:01:11.000000Z"
+            "created_at": "2026-06-13T23:31:42.000000Z"
         }
     ],
-    "path": "http://localhost:8000/api/posts",
-    "per_page": 15,
-    "next_cursor": "eyJpZCI6MTV9",
-    "next_page_url": "http://localhost:8000/api/posts?cursor=eyJpZCI6MTV9",
-    "prev_cursor": null,
-    "prev_page_url": null
+    "links": {
+        "first": null,
+        "last": null,
+        "prev": null,
+        "next": "http://localhost:8000/api/posts?cursor=eyJjcmVhdGVkX2F0IjoiMjAyNi0wNi0xMyAyMzozMTo0MiIsImlkIjo1MCwiX3BvaW50c1RvTmV4dEl0ZW1zIjp0cnVlfQ"
+    },
+    "meta": {
+        "path": "http://localhost:8000/api/posts",
+        "per_page": 15,
+        "next_cursor": "eyJjcmVhdGVkX2F0IjoiMjAyNi0wNi0xMyAyMzozMTo0MiIsImlkIjo1MCwiX3BvaW50c1RvTmV4dEl0ZW1zIjp0cnVlfQ",
+        "prev_cursor": null
+    }
 }
 ```
 
 **Notes:**
 - `media` is `null` if no image was uploaded with the post
 - `is_liked` indicates whether the authenticated user has liked the post
-- No numeric `id` fields are ever sent — only UUIDs
-- Pagination uses Laravel's cursor pagination
+- Only UUIDs are used — no numeric `id` fields are ever sent
+- Pagination uses Laravel's cursor pagination; metadata is inside `meta`
 
 ---
 
@@ -61,13 +63,49 @@ Returns public posts + the authenticated user's own private posts, newest first.
 | `image` | `file` | No | JPEG, PNG, JPG, GIF, WebP. Max 10MB |
 | `visibility` | `string` | No | `"public"` (default) or `"private"` |
 
-**Response:** `201 Created` — Returns the created post object (same shape as list item, no `data` wrapper).
+**Response:** `201 Created`
+```json
+{
+    "uuid": "ef5e9b13-fb1a-4bcd-a165-ba660d55709a",
+    "text": "This is a test post from the docs update",
+    "visibility": "public",
+    "user": {
+        "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+        "first_name": "Fahim",
+        "last_name": "al Emroz"
+    },
+    "media": null,
+    "likes_count": 0,
+    "comments_count": 0,
+    "is_liked": false,
+    "created_at": "2026-06-14T00:06:02.000000Z"
+}
+```
+
+Returns the created post object (same shape as list item, no `data` wrapper).
 
 ---
 
 ### `GET /api/posts/{post}` — Show single post
 
-**Response:** `200 OK` — Returns the post object (no `data` wrapper).
+**Response:** `200 OK`
+```json
+{
+    "uuid": "79f0c561-a0d7-40a9-9cbf-5d465679d5be",
+    "text": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    "visibility": "public",
+    "user": {
+        "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+        "first_name": "Fahim",
+        "last_name": "al Emroz"
+    },
+    "media": null,
+    "likes_count": 0,
+    "comments_count": 0,
+    "is_liked": false,
+    "created_at": "2026-06-13T23:31:42.000000Z"
+}
+```
 
 Returns `404` if the post is private and not owned by the authenticated user.
 
@@ -83,13 +121,11 @@ Only the post author can delete. Returns `404` otherwise.
 
 ### `POST /api/posts/{post}/like` — Toggle like
 
-**Request body:** None
-
 **Response:** `200 OK`
 ```json
 {
     "is_liked": true,
-    "likes_count": 6
+    "likes_count": 1
 }
 ```
 
@@ -102,10 +138,15 @@ Only the post author can delete. Returns `404` otherwise.
 {
     "data": [
         {
-            "uuid": "a10af5af-3581-42a5-8020-e79de7bd3b1b",
-            "first_name": "John",
-            "last_name": "Doe"
+            "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+            "first_name": "Fahim",
+            "last_name": "al Emroz"
         }
-    ]
+    ],
+    "meta": {
+        "next_cursor": null,
+        "prev_cursor": null,
+        "per_page": 15
+    }
 }
 ```

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -49,14 +50,16 @@ class PostService
 
     public function create(User $user, array $data, ?UploadedFile $image = null): Post
     {
-        $post = Post::create([
-            'uuid' => (string) Str::uuid(),
-            'user_id' => $user->id,
-            'text' => $data['text'],
-            'visibility' => $data['visibility'] ?? 'public',
-        ]);
+        return DB::transaction(function () use ($user, $data, $image) {
+            $post = Post::create([
+                'uuid' => (string) Str::uuid(),
+                'user_id' => $user->id,
+                'text' => $data['text'],
+                'visibility' => $data['visibility'] ?? 'public',
+            ]);
 
-        if ($image) {
+            if (!$image) return $this->show($user, $post);
+
             $path = $image->store('posts', 'public');
 
             Media::create([
@@ -64,9 +67,9 @@ class PostService
                 'post_id' => $post->id,
                 'path' => $path,
             ]);
-        }
 
-        return $this->show($user, $post);
+            return $this->show($user, $post);
+        });
     }
 
     public function show(User $user, Post $post): Post

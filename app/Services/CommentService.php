@@ -33,6 +33,7 @@ class CommentService
             ->withCount('likes')
             ->withExists(['likes as is_liked' => fn ($q) => $q->where('user_id', $user->id)])
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->cursorPaginate($limit);
     }
 
@@ -79,6 +80,7 @@ class CommentService
             throw new ModelNotFoundException();
         }
 
+        $comment->replies()->delete();
         $comment->delete();
     }
 }

@@ -10,7 +10,7 @@ Likes use a **polymorphic** relationship supporting both posts and comments. Cal
 ```json
 {
     "is_liked": true,
-    "likes_count": 6
+    "likes_count": 1
 }
 ```
 
@@ -23,11 +23,16 @@ Likes use a **polymorphic** relationship supporting both posts and comments. Cal
 {
     "data": [
         {
-            "uuid": "a10af5af-3581-42a5-8020-e79de7bd3b1b",
-            "first_name": "John",
-            "last_name": "Doe"
+            "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+            "first_name": "Fahim",
+            "last_name": "al Emroz"
         }
-    ]
+    ],
+    "meta": {
+        "next_cursor": null,
+        "prev_cursor": null,
+        "per_page": 15
+    }
 }
 ```
 
@@ -39,7 +44,7 @@ Likes use a **polymorphic** relationship supporting both posts and comments. Cal
 ```json
 {
     "is_liked": true,
-    "likes_count": 4
+    "likes_count": 1
 }
 ```
 
@@ -52,11 +57,16 @@ Likes use a **polymorphic** relationship supporting both posts and comments. Cal
 {
     "data": [
         {
-            "uuid": "a10af5af-3581-42a5-8020-e79de7bd3b1b",
-            "first_name": "Jane",
-            "last_name": "Doe"
+            "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+            "first_name": "Fahim",
+            "last_name": "al Emroz"
         }
-    ]
+    ],
+    "meta": {
+        "next_cursor": null,
+        "prev_cursor": null,
+        "per_page": 15
+    }
 }
 ```
 

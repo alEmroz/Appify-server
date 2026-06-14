@@ -11,49 +11,58 @@ Returns top-level comments with their replies nested, newest first.
 **Query params:**
 | Param | Type | Description |
 |-------|------|-------------|
-| `cursor` | `string` | Cursor for pagination |
+| `cursor` | `string` | Cursor for pagination (the `meta.next_cursor` value from the previous response) |
 
 **Response:** `200 OK`
 ```json
 {
     "data": [
         {
-            "uuid": "2608f86c-0492-4af7-af34-f390984da6c5",
+            "uuid": "e29ebb71-bad8-4a21-9c0f-769cd451f4c9",
             "text": "Great post!",
             "user": {
-                "uuid": "a10af5af-3581-42a5-8020-e79de7bd3b1b",
-                "first_name": "John",
-                "last_name": "Doe"
+                "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+                "first_name": "Fahim",
+                "last_name": "al Emroz"
             },
-            "likes_count": 3,
-            "is_liked": true,
-            "created_at": "2026-06-13T13:01:56.000000Z",
+            "likes_count": 0,
+            "is_liked": false,
+            "created_at": "2026-06-14T00:06:10.000000Z",
             "replies": [
                 {
-                    "uuid": "48e535e7-e46f-40d6-8567-dec23dd4451a",
+                    "uuid": "98609657-be1b-4f4b-9dad-c26f865e16a3",
                     "text": "Thanks!",
                     "user": {
-                        "uuid": "a10af5af-3581-42a5-8020-e79de7bd3b1b",
-                        "first_name": "Jane",
-                        "last_name": "Doe"
+                        "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+                        "first_name": "Fahim",
+                        "last_name": "al Emroz"
                     },
-                    "likes_count": 1,
+                    "likes_count": 0,
                     "is_liked": false,
-                    "created_at": "2026-06-13T13:01:56.000000Z"
+                    "created_at": "2026-06-14T00:06:17.000000Z"
                 }
             ]
         }
     ],
-    "path": "http://localhost:8000/api/posts/{uuid}/comments",
-    "per_page": 15,
-    "next_cursor": null,
-    "next_page_url": null,
-    "prev_cursor": null,
-    "prev_page_url": null
+    "links": {
+        "first": null,
+        "last": null,
+        "prev": null,
+        "next": null
+    },
+    "meta": {
+        "path": "http://localhost:8000/api/posts/79f0c561-a0d7-40a9-9cbf-5d465679d5be/comments",
+        "per_page": 15,
+        "next_cursor": null,
+        "prev_cursor": null
+    }
 }
 ```
 
-**Note:** No numeric `id` fields are ever sent — only UUIDs. `parent_id` is internal only.
+**Notes:**
+- `replies` is an empty array `[]` if the comment has no replies
+- Replies have the same shape as comments but no `replies` key
+- Only UUIDs are used — no numeric `id` fields are ever sent
 
 ---
 
@@ -64,7 +73,23 @@ Returns top-level comments with their replies nested, newest first.
 |-------|------|----------|-------------|
 | `text` | `string` | Yes | Max 2000 characters |
 
-**Response:** `201 Created` — Returns the created comment (no `data` wrapper, no `replies` key).
+**Response:** `201 Created`
+```json
+{
+    "uuid": "e29ebb71-bad8-4a21-9c0f-769cd451f4c9",
+    "text": "Great post!",
+    "user": {
+        "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+        "first_name": "Fahim",
+        "last_name": "al Emroz"
+    },
+    "likes_count": 0,
+    "is_liked": false,
+    "created_at": "2026-06-14T00:06:10.000000Z"
+}
+```
+
+Returns the created comment (no `data` wrapper, no `replies` key).
 
 ---
 
@@ -72,7 +97,21 @@ Returns top-level comments with their replies nested, newest first.
 
 **Request (JSON):** Same as create comment (`text`).
 
-**Response:** `201 Created` — Returns the created reply object.
+**Response:** `201 Created`
+```json
+{
+    "uuid": "98609657-be1b-4f4b-9dad-c26f865e16a3",
+    "text": "Thanks!",
+    "user": {
+        "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+        "first_name": "Fahim",
+        "last_name": "al Emroz"
+    },
+    "likes_count": 0,
+    "is_liked": false,
+    "created_at": "2026-06-14T00:06:17.000000Z"
+}
+```
 
 Returns `404` if trying to reply to a reply (only top-level comments can have replies).
 
@@ -92,7 +131,7 @@ Only the comment author can delete. Returns `404` otherwise.
 ```json
 {
     "is_liked": true,
-    "likes_count": 4
+    "likes_count": 1
 }
 ```
 
@@ -105,10 +144,15 @@ Only the comment author can delete. Returns `404` otherwise.
 {
     "data": [
         {
-            "uuid": "a10af5af-3581-42a5-8020-e79de7bd3b1b",
-            "first_name": "John",
-            "last_name": "Doe"
+            "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+            "first_name": "Fahim",
+            "last_name": "al Emroz"
         }
-    ]
+    ],
+    "meta": {
+        "next_cursor": null,
+        "prev_cursor": null,
+        "per_page": 15
+    }
 }
 ```

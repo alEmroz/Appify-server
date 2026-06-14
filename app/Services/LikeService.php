@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Resources\UserResource;
 use App\Models\Like;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -38,16 +39,11 @@ class LikeService
         ];
     }
 
-    public function likers(Model $likeable): array
+    public function likers(Model $likeable): CursorPaginator
     {
-        $likers = $likeable->likes()
+        return $likeable->likes()
             ->with('user')
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->pluck('user');
-
-        return [
-            'data' => UserResource::collection($likers),
-        ];
+            ->cursorPaginate(15);
     }
 }

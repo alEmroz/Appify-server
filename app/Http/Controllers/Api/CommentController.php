@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Resources\CommentResource;
+use App\Http\Resources\UserResource;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Services\CommentService;
@@ -22,7 +23,11 @@ class CommentController extends Controller
 
     public function index(Request $request, Post $post): JsonResponse
     {
-        $comments = $this->commentService->listByPost($request->user(), $post);
+        $comments = $this->commentService->listByPost(
+            $request->user(),
+            $post,
+            $request->query('cursor'),
+        );
 
         $commentsResource = CommentResource::collection($comments);
 
@@ -71,8 +76,18 @@ class CommentController extends Controller
 
     public function likes(Request $request, Comment $comment): JsonResponse
     {
-        $result = $this->likeService->likers($comment);
+        $paginator = $this->likeService->likers($comment);
 
-        return response()->json($result, Response::HTTP_OK);
+        $users = collect($paginator->items())
+            ->map(fn ($like) => new UserResource($like->user));
+
+        return response()->json([
+            'data' => $users,
+            'meta' => [
+                'next_cursor' => $paginator->nextCursor()?->encode(),
+                'prev_cursor' => $paginator->previousCursor()?->encode(),
+                'per_page' => $paginator->perPage(),
+            ],
+        ]);
     }
 }
