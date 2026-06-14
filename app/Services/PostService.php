@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -67,6 +68,34 @@ class PostService
                 'post_id' => $post->id,
                 'path' => $path,
             ]);
+
+            return $this->show($user, $post);
+        });
+    }
+
+    public function update(User $user, Post $post, array $data, ?UploadedFile $image = null): Post
+    {
+        if ($post->user_id !== $user->id) {
+            throw new ModelNotFoundException();
+        }
+
+        return DB::transaction(function () use ($user, $post, $data, $image) {
+            $post->update(Arr::only($data, ['text', 'visibility']));
+
+            if ($image) {
+                if ($post->media) {
+                    Storage::disk('public')->delete($post->media->path);
+                    $post->media->delete();
+                }
+
+                $path = $image->store('posts', 'public');
+
+                Media::create([
+                    'uuid' => (string) Str::uuid(),
+                    'post_id' => $post->id,
+                    'path' => $path,
+                ]);
+            }
 
             return $this->show($user, $post);
         });

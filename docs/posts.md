@@ -111,6 +111,38 @@ Returns `404` if the post is private and not owned by the authenticated user.
 
 ---
 
+### `PUT /api/posts/{post}` — Update post
+
+**Request (multipart/form-data):**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `text` | `string` | No | Max 5000 characters. Only provided fields are updated |
+| `image` | `file` | No | JPEG, PNG, JPG, GIF, WebP. Max 10MB. Replaces existing image |
+| `visibility` | `string` | No | `"public"` or `"private"` |
+
+**Response:** `200 OK`
+```json
+{
+    "uuid": "ef5e9b13-fb1a-4bcd-a165-ba660d55709a",
+    "text": "Updated post text",
+    "visibility": "private",
+    "user": {
+        "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+        "first_name": "Fahim",
+        "last_name": "al Emroz"
+    },
+    "media": null,
+    "likes_count": 0,
+    "comments_count": 0,
+    "is_liked": false,
+    "created_at": "2026-06-14T00:06:02.000000Z"
+}
+```
+
+Only the post author can update. Uses `_method: "PUT"` inside the multipart form. Returns `404` if not the owner.
+
+---
+
 ### `DELETE /api/posts/{post}` — Delete post
 
 **Response:** `204 No Content`

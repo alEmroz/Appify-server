@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
 use App\Models\Post;
@@ -48,6 +49,20 @@ class PostController extends Controller
     public function show(Request $request, Post $post): JsonResponse
     {
         $post = $this->postService->show($request->user(), $post);
+
+        $postResource = new PostResource($post);
+
+        return response()->json($postResource);
+    }
+
+    public function update(UpdatePostRequest $request, Post $post): JsonResponse
+    {
+        $post = $this->postService->update(
+            $request->user(),
+            $post,
+            $request->safe()->except('image'),
+            $request->file('image'),
+        );
 
         $postResource = new PostResource($post);
 
