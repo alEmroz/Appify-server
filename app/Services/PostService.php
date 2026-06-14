@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -76,7 +75,9 @@ class PostService
 
     public function update(User $user, Post $post, array $data, ?UploadedFile $image = null): Post
     {
-        Gate::authorize('update', $post);
+        if (!$user->can('update', $post)) {
+            throw new ModelNotFoundException();
+        }
 
         return DB::transaction(function () use ($user, $post, $data, $image) {
             $post->update(Arr::only($data, ['text', 'visibility']));
@@ -116,7 +117,9 @@ class PostService
 
     public function delete(User $user, Post $post): void
     {
-        Gate::authorize('delete', $post);
+        if (!$user->can('delete', $post)) {
+            throw new ModelNotFoundException();
+        }
 
         if ($post->media) {
             Storage::disk('public')->delete($post->media->path);

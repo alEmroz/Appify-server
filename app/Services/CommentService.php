@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class CommentService
@@ -78,7 +77,9 @@ class CommentService
 
     public function update(User $user, Comment $comment, array $data): Comment
     {
-        Gate::authorize('update', $comment);
+        if (!$user->can('update', $comment)) {
+            throw new ModelNotFoundException();
+        }
 
         $comment->update(Arr::only($data, ['text']));
 
@@ -91,7 +92,9 @@ class CommentService
 
     public function delete(User $user, Comment $comment): void
     {
-        Gate::authorize('delete', $comment);
+        if (!$user->can('delete', $comment)) {
+            throw new ModelNotFoundException();
+        }
 
         $comment->replies()->delete();
         $comment->delete();

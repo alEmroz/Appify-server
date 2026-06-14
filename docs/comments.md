@@ -93,6 +93,33 @@ Returns the created comment (no `data` wrapper, no `replies` key).
 
 ---
 
+### `PUT /api/comments/{comment}` — Update comment
+
+**Request (JSON):**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `text` | `string` | No (but at least one field required) | Max 2000 characters |
+
+**Response:** `200 OK`
+```json
+{
+    "uuid": "e29ebb71-bad8-4a21-9c0f-769cd451f4c9",
+    "text": "Updated text!",
+    "user": {
+        "uuid": "3992f891-5d33-4aad-9953-4f3038d338e5",
+        "first_name": "Fahim",
+        "last_name": "al Emroz"
+    },
+    "likes_count": 0,
+    "is_liked": false,
+    "created_at": "2026-06-14T00:06:10.000000Z"
+}
+```
+
+Only the comment author can update. Returns `404` otherwise.
+
+---
+
 ### `POST /api/comments/{comment}/reply` — Reply to a comment
 
 **Request (JSON):** Same as create comment (`text`).
