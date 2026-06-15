@@ -20,6 +20,7 @@ return new class extends Migration
             $table->index('user_id');
             $table->index('post_id');
             $table->index('parent_id');
+            $table->index(['post_id', 'parent_id', 'created_at', 'id']);
         });
     }
 
